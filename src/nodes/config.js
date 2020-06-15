@@ -144,6 +144,16 @@ module.exports = function (RED) {
     })
   })
 
+  RED.httpAdmin.post('/force/credentials/:id/reset', function (req, res) {
+    var id = req.params.id;
+    var credentials = RED.nodes.getCredentials(id);
+    credentials.userId = null;
+    RED.nodes.addCredentials(id, credentials);
+    return res.json({
+      userId: credentials.userId
+    })
+  })
+
   RED.httpAdmin.get('/force/credentials/:id/auth', function (req, res) {
     var id = req.query.id;
     var salesforceConfig = RED.nodes.getNode(id);

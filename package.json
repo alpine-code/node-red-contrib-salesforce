@@ -1,6 +1,6 @@
 {
     "name": "node-red-contrib-salesforce-ac",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "description": "Salesforce for Node-RED ",
     "main": "index.js",
     "scripts": {
