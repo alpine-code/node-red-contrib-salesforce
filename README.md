@@ -7,3 +7,7 @@
 [![Build Status](https://drone.alpine-code.com/api/badges/alpine-code/node-red-contrib-salesforce/status.svg)](https://drone.alpine-code.com/alpine-code/node-red-contrib-salesforce)
 
 This module leverages the [jsforce](https://jsforce.github.io/) client library to bring Salesforce awesomeness to Node-RED!
+
+## Credits
+
+The package is developed and maintained by [Alpine Code](https://www.alpine-code.com/).
