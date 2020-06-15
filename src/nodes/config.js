@@ -44,8 +44,8 @@ module.exports = function (RED) {
          * oauth
          */
 
-        if (!accessToken || !instanceUrl) {
-          var error = new Error("accessToken or instanceUrl missing");
+        if (!credentials.accessToken || !credentials.refreshToken || !credentials.instanceUrl) {
+          var error = new Error("accessToken, refreshToken or instanceUrl missing");
           return callback(error);
         }
 
@@ -56,9 +56,9 @@ module.exports = function (RED) {
             clientsecret: credentials.clientSecret,
             redirectUri: credentials.redirectUri
           },
+          accessToken: credentials.accessToken,
           refreshToken: credentials.refreshToken,
-          accessToken: accessToken,
-          instanceUrl: instanceUrl
+          instanceUrl: credentials.instanceUrl
         };
 
         var conn = new jsforce.Connection(connConfig);
