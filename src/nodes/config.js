@@ -6,11 +6,37 @@ module.exports = function (RED) {
     RED.nodes.createNode(this, config);
     var node = this;
 
+    if (config.loginType == "oauth") {
+
+    }
+    if (config.loginType == "Username-Password") {
+      var basicCredentials = {
+        id: node.id,
+        username: config.username,
+        password: node.credentials.password,
+        loginType: 'Username-Password',
+        loginUrl: config.loginUrl
+      };
+      RED.nodes.addCredentials(node.id, basicCredentials);
+    }
+    if (config.loginType == "Signed-Request") {
+      var basicCredentials = {
+        id: node.id,
+        loginType: 'Signed-Request'
+      };
+      RED.nodes.addCredentials(node.id, basicCredentials);
+    }
+
     var credentials = RED.nodes.getCredentials(node.id);
 
+    // The connection.
+    node.conn = null;
+
     node.login = function (msg, callback) {
-      var accessToken = msg.accessToken || credentials.accessToken;
-      var instanceUrl = msg.instanceUrl || credentials.instanceUrl;
+
+      if (node.conn) {
+        return callback(null, node.conn);
+      }
 
       if (credentials.loginType === "oauth") {
 
@@ -18,12 +44,9 @@ module.exports = function (RED) {
          * oauth
          */
 
-        if(node.conn) {
-          return callback(error, node.conn);
-        } else {
-        var error;
         if (!accessToken || !instanceUrl) {
-          error = new Error("accessToken or instanceUrl missing")
+          var error = new Error("accessToken or instanceUrl missing");
+          return callback(error);
         }
 
         var connConfig = {
@@ -47,7 +70,7 @@ module.exports = function (RED) {
         // });
 
         // Refresh accessToken using refreshToken
-        conn.on("refresh", function(accessToken, res) {
+        conn.on("refresh", function (accessToken, res) {
           console.log("refresh")
           console.log(accessToken, res)
           credentials.accessToken = accessToken;
@@ -55,8 +78,7 @@ module.exports = function (RED) {
         });
 
         node.conn = conn;
-        return callback(error, conn);
-        }
+        return callback(null, conn);
 
       } else if (credentials.loginType === "Username-Password") {
 
@@ -67,13 +89,14 @@ module.exports = function (RED) {
         var conn = new jsforce.Connection({
           loginUrl: credentials.loginUrl
         });
-        var error;
 
-        conn.login(credentials.username, credentials.password, function (err, userInfo) {
-          if (err) {
-            error = err;
+        conn.login(credentials.username, credentials.password, function (error, userInfo) {
+          if (error) {
+            return callback(error);
+          } else {
+            node.conn = conn;
+            return callback(null, conn);
           }
-          return callback(error, conn);
         });
 
       } else if (credentials.loginType === "Signed-Request") {
@@ -82,10 +105,15 @@ module.exports = function (RED) {
          * Signed-Request
          */
 
+        var accessToken = msg.accessToken;
+        var instanceUrl = msg.instanceUrl;
+
         var conn = new jsforce.Connection({
           accessToken: accessToken,
           instanceUrl: instanceUrl
         });
+
+        node.conn = conn;
         return callback(null, conn);
 
       }
@@ -95,7 +123,9 @@ module.exports = function (RED) {
   RED.nodes.registerType('salesforce-config', SalesforceConfigNode, {
     credentials: {
       id: { type: 'text' },
+      loginUrl: { type: 'text' },
       loginType: { type: 'text' },
+      username: { type: 'text' },
       password: { type: 'password' },
       clientId: { type: 'password' },
       clientSecret: { type: 'password' },

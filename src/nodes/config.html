@@ -2,14 +2,14 @@
   RED.nodes.registerType('salesforce-config', {
     category: 'config',
     defaults: {
-      username: { value: '', required: true },
-      loginUrl: { value: "https://login.salesforce.com" },
-      loginType: { value: "Username-Password" },
+      loginUrl: { value: "https://login.salesforce.com", required: true },
+      loginType: { value: "Username-Password", required: true  },
+      username: { value: '', required: true }
     },
     credentials: {
-      password: { type: 'password', required: true },
-      clientId: { type: 'password', required: true },
-      clientSecret: { type: 'password', required: true },
+      password: { type: 'password' },
+      clientId: { type: 'password' },
+      clientSecret: { type: 'password' },
       userId: { type: 'text' }
     },
     label: function () {
@@ -115,7 +115,7 @@
         } else {
           passwordel.hide();
           clientIdel.hide();
-          secretel.show();
+          secretel.hide();
           buttonel.hide();
           tooltipel.hide();
           loginUrlel.hide();
@@ -130,9 +130,9 @@
       <div class="form-row">
         <label for="node-config-input-loginType"><i class="fa fa-plug"></i> Login Type</label>
         <select type="text" id="node-config-input-loginType" style="width:70%">
-          <option value="Username-Password">login By Username-Password</option>
-          <option value="oauth">login By OAuth2</option>
-          <option value="Signed-Request">login By Signed-Request</option>
+          <option value="Username-Password">Username Password</option>
+          <option value="oauth">OAuth2</option>
+          <option value="Signed-Request">Signed Request</option>
         </select>
       </div>
       <div class="form-tips" id="node-config-force-tooltip">
@@ -177,17 +177,16 @@
 <script type="text/x-red" data-help-name="salesforce-config" data-lang="en-US">
     <p>Set login information for force.com. This node uses the following three login methods.</p>
     <ul>
-      <li>Login with username / password：
-        <p>Set Username(<code>User Name</code>) and Password(<code>Password</code>).</p>
+      <li>Login with <strong>Username Password</strong>
+        <p>Set Username (<code>User Name</code>) and Password (<code>Password</code>, with Security Token).</p>
       </li>
-      <li>Login with OAuth2：
+      <li>Login with <strong>OAuth2</strong>
         <p>When logging in with OAuth2, Create a Connected App with salesforce Setup -> Create -> Apps</p>
         <p>At this time, specify the Redirect URL displayed on the node setting screen as the Callback URL of the Connected App.</p>
-        <p>Set the Username(<code>User Name</code>), Consumer Key(<code>Client Id</code>), and Consumer Secret(<code>Client Secret</code>), and click the <code>Authenticate with Salesforce</code> button to get login information.</p>
+        <p>Set the Username (<code>User Name</code>), Consumer Key (<code>Client Id</code>) and Consumer Secret (<code>Client Secret</code>). Click then <code>Authenticate with Salesforce</code> button to fetch the Access Token and Refresh Token.</p>
       </li>
-      <li>Login with Signed Request：
-        <p>When logging in with a Signed Request, Create a Connected App with salesforce Setup -> Create -> Apps</p>
-        <p>Set the Username(<code>User Name</code>) and Consumer Secret(<code>Client Secret</code>).</p>
+      <li>Login with <strong>Signed Request</strong>
+        <p>When logging in with a Signed Request, provide <code>msg.accessToken</code> and <code>msg.instanceUrl</code>.</p>
       </li>
     </ul>
 </script>
