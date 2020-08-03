@@ -40,7 +40,7 @@
       updateForceAuthButton();
 
       function pollForceCredentialsUrl() {
-        $.getJSON('/force/credentials/' + id, function (data) {
+        $.getJSON(pathname + 'force/credentials/' + id, function (data) {
           if (data.userId) {
             updateForceUserId(data.userId);
             delete window.forceConfigNodeIntervalId;

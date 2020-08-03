@@ -5,14 +5,12 @@ const salesforceHelper = require('../util/salesforceHelper');
 module.exports = function (RED) {
   'use strict';
 
-  function SalesforceOperationNode(config) {
+  function SalesforceApexNode(config) {
     RED.nodes.createNode(this, config);
     var node = this;
 
     node.salesforce = config.salesforce;
-    node.sobject = config.sobject;
-    node.extname = config.extname;
-    node.maxfetch = config.maxfetch;
+    node.path = config.path;
     node.operation = config.operation;
     node.salesforceConfig = RED.nodes.getNode(node.salesforce);
 
@@ -39,40 +37,29 @@ module.exports = function (RED) {
           }
           switch (node.operation) {
 
-            case 'query':
-              var records = [];
-              //msg.payload = salesforceHelper.convType(msg.payload, 'string');
-              var query = conn.query(msg.payload)
-                .on("record", function (record) {
-                  records.push(record);
-                })
-                .on("end", function () {
-                  node.sendMsg(null, records);
-                })
-                .on("error", function (err) {
-                  node.sendMsg(err);
-                })
-                .run({ autoFetch: true, maxFetch: node.maxfetch });
+            case 'get':
+              //msg.payload = salesforceHelper.convType(msg.payload, 'object');
+              conn.apex.get(msg.path, node.sendMsg);
               break;
 
-            case 'create':
+            case 'post':
               //msg.payload = salesforceHelper.convType(msg.payload, 'object');
-              conn.sobject(node.sobject).create(msg.payload, node.sendMsg);
+              conn.apex.post(msg.path, msg.payload, node.sendMsg);
               break;
 
-            case 'update':
+            case 'put':
               //msg.payload = salesforceHelper.convType(msg.payload, 'object');
-              conn.sobject(node.sobject).update(msg.payload, node.sendMsg);
+              conn.apex.put(msg.path, msg.payload, node.sendMsg);
               break;
 
-            case 'upsert':
+            case 'patch':
               //msg.payload = salesforceHelper.convType(msg.payload, 'object');
-              conn.sobject(node.sobject).upsert(msg.payload, node.extname, node.sendMsg);
+              conn.apex.patch(msg.path, msg.payload, node.sendMsg);
               break;
 
             case 'delete':
               //msg.payload = salesforceHelper.convType(msg.payload, 'object');
-              conn.sobject(node.sobject).destroy(msg.payload, node.sendMsg);
+              conn.apex.delete(msg.path, msg.payload, node.sendMsg);
               break;
 
           }
@@ -87,5 +74,5 @@ module.exports = function (RED) {
 
   }
 
-  RED.nodes.registerType('salesforce-operation', SalesforceOperationNode);
+  RED.nodes.registerType('salesforce-apex', SalesforceApexNode);
 }

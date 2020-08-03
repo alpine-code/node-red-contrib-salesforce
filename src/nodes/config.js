@@ -49,7 +49,7 @@ module.exports = function (RED) {
           return callback(error);
         }
 
-        var connConfig = {
+        var conn = new jsforce.Connection({
           oauth2: {
             loginUrl: credentials.loginUrl,
             clientId: credentials.clientId,
@@ -59,9 +59,7 @@ module.exports = function (RED) {
           accessToken: credentials.accessToken,
           refreshToken: credentials.refreshToken,
           instanceUrl: credentials.instanceUrl
-        };
-
-        var conn = new jsforce.Connection(connConfig);
+        });
 
         // Refresh accessToken using refreshToken
         // conn.oauth2.refreshToken(credentials.refreshToken, (err, results) => {
@@ -71,8 +69,8 @@ module.exports = function (RED) {
 
         // Refresh accessToken using refreshToken
         conn.on("refresh", function (accessToken, res) {
-          console.log("refresh")
-          console.log(accessToken, res)
+          console.log("oauthRefresh")
+          console.log('accessToken', accessToken)
           credentials.accessToken = accessToken;
           RED.nodes.addCredentials(node.id, credentials);
         });
