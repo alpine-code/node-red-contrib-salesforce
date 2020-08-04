@@ -10,39 +10,32 @@ module.exports = function (RED) {
         var node = this;
 
         node.salesforce = config.salesforce;
-        node.topic = config.topic;
         node.salesforceConfig = RED.nodes.getNode(node.salesforce);
+        node.topic = config.topic;
 
         if (node.salesforceConfig) {
 
             status.warningRing(node, 'connecting');
 
+
             node.sendMsg = function (err, result) {
                 if (err) {
-                    node.error(err.message, msg);
                     status.error(node, err.message);
                 } else {
                     status.clear(node);
                 }
+                var msg = {};
                 msg.payload = result;
                 return node.send(msg);
             };
 
-            node.salesforceConfig.login(msg, function (err, conn) {
+            node.salesforceConfig.login(null, function (err, conn) {
                 if (err) {
-                    return node.sendMsg(err);
+                    return status.error(node, err.message);
                 }
-
                 status.infoRing(node, "connected");
                 conn.streaming.topic(node.topic).subscribe(function (message) {
-                    status.success(node, "message");
-                    node.sendMsg(null, {
-                        payload: {
-                            eventType: message.event.type,
-                            eventCreatedDate: message.event.createdDate,
-                            objectId: message.sobject.Id,
-                        }
-                    })
+                    node.sendMsg(null, message);
                 });
 
             });

@@ -10,15 +10,16 @@ module.exports = function (RED) {
     var node = this;
 
     node.salesforce = config.salesforce;
-    node.sobject = config.sobject;
-    node.extname = config.extname;
-    node.maxfetch = config.maxfetch;
-    node.operation = config.operation;
     node.salesforceConfig = RED.nodes.getNode(node.salesforce);
 
     if (node.salesforceConfig) {
 
       node.on('input', function (msg) {
+
+        node.sobject = msg.sobject || config.sobject;
+        node.extname = msg.extname || config.extname;
+        node.maxfetch = msg.maxfetch || config.maxfetch;
+        node.operation = msg.operation || config.operation;
 
         status.info(node, "processing");
 

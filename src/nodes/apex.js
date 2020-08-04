@@ -10,13 +10,14 @@ module.exports = function (RED) {
     var node = this;
 
     node.salesforce = config.salesforce;
-    node.path = config.path;
-    node.operation = config.operation;
     node.salesforceConfig = RED.nodes.getNode(node.salesforce);
 
     if (node.salesforceConfig) {
 
       node.on('input', function (msg) {
+
+        node.path = msg.path || config.path;
+        node.operation = msg.operation || config.operation;
 
         status.info(node, "processing");
 
@@ -39,27 +40,27 @@ module.exports = function (RED) {
 
             case 'get':
               //msg.payload = salesforceHelper.convType(msg.payload, 'object');
-              conn.apex.get(msg.path, node.sendMsg);
+              conn.apex.get(node.path, node.sendMsg);
               break;
 
             case 'post':
               //msg.payload = salesforceHelper.convType(msg.payload, 'object');
-              conn.apex.post(msg.path, msg.payload, node.sendMsg);
+              conn.apex.post(node.path, msg.payload, node.sendMsg);
               break;
 
             case 'put':
               //msg.payload = salesforceHelper.convType(msg.payload, 'object');
-              conn.apex.put(msg.path, msg.payload, node.sendMsg);
+              conn.apex.put(node.path, msg.payload, node.sendMsg);
               break;
 
             case 'patch':
               //msg.payload = salesforceHelper.convType(msg.payload, 'object');
-              conn.apex.patch(msg.path, msg.payload, node.sendMsg);
+              conn.apex.patch(node.path, msg.payload, node.sendMsg);
               break;
 
             case 'delete':
               //msg.payload = salesforceHelper.convType(msg.payload, 'object');
-              conn.apex.delete(msg.path, msg.payload, node.sendMsg);
+              conn.apex.delete(node.path, msg.payload, node.sendMsg);
               break;
 
           }

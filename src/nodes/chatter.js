@@ -10,13 +10,14 @@ module.exports = function (RED) {
     var node = this;
 
     node.salesforce = config.salesforce;
-    node.path = config.path;
-    node.operation = config.operation;
     node.salesforceConfig = RED.nodes.getNode(node.salesforce);
 
     if (node.salesforceConfig) {
 
       node.on('input', function (msg) {
+
+        node.path = msg.path || config.path;
+        node.operation = msg.operation || config.operation;
 
         status.info(node, "processing");
 
@@ -39,12 +40,12 @@ module.exports = function (RED) {
 
             case 'retrieve':
               //msg.payload = salesforceHelper.convType(msg.payload, 'object');
-              conn.chatter.resource(msg.path).retrieve(node.sendMsg);
+              conn.chatter.resource(node.path).retrieve(node.sendMsg);
               break;
 
             case 'create':
               //msg.payload = salesforceHelper.convType(msg.payload, 'object');
-              conn.chatter.resource(msg.path).create(msg.payload, node.sendMsg);
+              conn.chatter.resource(node.path).create(msg.payload, node.sendMsg);
               break;
               
           }

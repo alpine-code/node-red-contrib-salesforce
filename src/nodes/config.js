@@ -49,6 +49,8 @@ module.exports = function (RED) {
           return callback(error);
         }
 
+        console.log(credentials);
+
         var conn = new jsforce.Connection({
           oauth2: {
             loginUrl: credentials.loginUrl,

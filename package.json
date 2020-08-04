@@ -1,6 +1,6 @@
 {
     "name": "@alpine-code/node-red-contrib-salesforce",
-    "version": "0.5.0",
+    "version": "0.5.1",
     "description": "Salesforce for Node-RED ",
     "main": "index.js",
     "scripts": {
